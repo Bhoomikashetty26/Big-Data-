@@ -1,0 +1,46 @@
+import java.io.IOException;
+import java.util.StringTokenizer;
+import Org.apache.hadoop.conf.configuration;
+import org.apache.hadoop.fs.path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.Mapreduce.Job;
+import org.apache.hadoop.Mapreduce.Mapper;
+import org.apache.hadoop.Mapreduce.Reducer;
+import org.apache.hadoop.Mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.Mapreduce.lib.output.FileOutputFormat;
+public class WordCount{
+public static class TokenizerMapper extends Mapper<object,Text,Text,IntWritable>{
+private final static IntWritable one = new IntWritable(1);
+private Text Word = new Text();
+public void Map(object key,Text value,Context context) throws IOException,InterruptedException(
+StringTokenizer itr = new StringTokenizer(value.toString());
+while(itr.hasMoreTokens()){
+word.set(itr.nextToken());
+Context.write(word,one);
+}
+}
+}
+public static class IntSumReducer extends Reducer < Text,IntWritable,Text,IntWritable>{
+private IntWritable result = new IntWritable();
+public void reduce(Text Key, Iterable < IntWritable > Values,Context context ) throws IOException,InterruptedException{
+int sum=0;
+for(IntWritable val: values){
+sum += val.get();
+}
+result.get(sum);
+Context.Write(Key,result);
+}
+}
+public static void main(String[] args) throws Exception {
+Configuration conf =new Configuration();
+Job job = job.getInstance(conf,"word count");
+job.SetJarByClass(WordCoount.class);
+job.SetMapperClass(TokenizerMapper.class);
+job.SetCombinerClass(IntSumReducer.class);
+job.SetReducerClass(IntSumReducer.class);
+job.SetOutputKeyClass(Text.class);
+job.SetOutputValueClass(IntWritable.class);
+FileInputFormat.addInputPath(job,new Path(args[0]));
+FileOutputFormat.SetOutputPath(job,new Path(args[0]));
+System.exit(job,WaitForCompletion(true) ? 0:1);
